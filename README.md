@@ -1,13 +1,20 @@
-# deepFlame v0.1.0
-deepFlame is a computational fluid dynamics package for single or multiphase, laminar or turbulent, reacting flows in all speeds with machine learning capabilities.  
+# DeepFlame v0.1.0
+DeepFlame is a computational fluid dynamics suite for single or multiphase, laminar or turbulent, reacting flows in all speeds with machine learning capabilities. 
 
 ## Dependencies
 OpenFOAM-7, Cantera C++ lib 2.6.0, Torch C++ lib 1.11.0
 
 ## Features
-You can use Cantera or ANN(torch) to calculate multi-step chemitry.
-This repository offers solvers for zero-D, low mach flow, high speed flow and spray.
-The original OpenFOAM multi-component species are totally removed, replaced by the newly designed CanteraMixture class.
+- Native Cantera reader for chemical mechanisms in `.cti`, `.xml` or `.ymal` formats
+- Full compatiblity with Cantera's `UnityLewis`, `Mix` and `Multi` transport models
+- Zero-dimensional constant pressure or constant volume reactor solver `df0DFoam`
+- Pressued-based low-Mach number reacting flow solver `dfLowMachFoam`
+- Density-based high-speed reacting flow solver `dfHighSpeedFoam`
+- Two-phase Lagrangian/Euler spray reacting flow solver `dfSprayFoam`
+- Cantera's native SUNDIALS CVODE solver for chemical reaction rate evaluation
+- Torch's tensor operation functionality for neutral network I/O and calculation
+- Interface for DNN model to obtain chemical reaction rates 
+- Multiple example and tutorial cases with `Allrun` and `Allclean` scripts
 
 ## How to install
 ```shell
@@ -32,3 +39,8 @@ source deepflame/bashrc
 cd to examples, execute Allrun
 
 for torch model, please contact ? or read this paper ?
+
+## Citing DeepFlame
+If you use DeepFlame for a publication, please use the citation: 
+
+DeepFlame: An OpenFOAM-based CFD suite for multiphase turbulent reacting flows at all speeds with machine learning. URL:https://github.com/deepmodeling/deepflame-dev, 2022.
