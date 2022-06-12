@@ -1,0 +1,21 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+
+# Parse arguments for library compilation
+. $WM_PROJECT_DIR/wmake/scripts/AllwmakeParseArguments
+
+wmake src/thermophysicalModels/thermophysicalProperties
+wmake src/thermophysicalModels/basic
+wmake src/CanteraMixture
+wmake src/thermophysicalModels/SLGThermo
+wmake src/dfChemistryModel
+wmake src/TurbulenceModels/compressible
+wmake src/regionModels/surfaceFilmModels
+src/lagrangian/Allwmake $targetType $*
+
+wmake applications/solvers/df0DFoam
+wmake applications/solvers/dfLowMachFoam
+wmake applications/solvers/dfHighSpeedFoam
+wmake applications/solvers/dfSprayFoam
+
+wmake applications/utilities/flameSpeed

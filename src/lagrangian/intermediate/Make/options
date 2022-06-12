@@ -1,0 +1,37 @@
+EXE_INC = \
+    -I$(LIB_SRC)/lagrangian/basic/lnInclude \
+    -I$(LIB_SRC)/lagrangian/distributionModels/lnInclude \
+    -I$(DF_SRC)/lagrangian/intermediate/lnInclude \
+    -I$(LIB_SRC)/lagrangian/intermediate/lnInclude \
+    -I$(LIB_SRC)/transportModels/compressible/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(DF_SRC)/thermophysicalModels/thermophysicalProperties/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/thermophysicalProperties/lnInclude \
+    -I$(DF_SRC)/thermophysicalModels/SLGThermo/lnInclude \
+    -I$(CANTERA_ROOT)/include \
+    -I$(DF_SRC)/CanteraMixture/lnInclude \
+    -I$(LIB_SRC)/transportModels \
+    -I$(LIB_SRC)/regionModels/regionModel/lnInclude \
+    -I$(LIB_SRC)/regionModels/surfaceFilmModels/lnInclude \
+    -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
+    -I$(LIB_SRC)/sampling/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude
+
+LIB_LIBS = \
+    $(CANTERA_ROOT)/lib/libcantera.so \
+    -L$(FOAM_USER_LIBBIN) \
+    -lCanteraMixture \
+    -llagrangian \
+    -ldistributionModels \
+    -lcompressibleTransportModels \
+    -ldfFluidThermophysicalModels \
+    -ldfThermophysicalProperties \
+    -ldfSLGThermo \
+    -lincompressibleTransportModels \
+    -lregionModels \
+    -ldfSurfaceFilmModels \
+    -ldynamicFvMesh \
+    -lsampling \
+    -lfiniteVolume \
+    -lmeshTools

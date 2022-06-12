@@ -1,0 +1,19 @@
+workDir = $(SRC_ORIG)/thermophysicalModels/basic/
+$(workDir)/basicThermo/basicThermo.C
+$(workDir)/fluidThermo/fluidThermo.C
+
+$(workDir)/psiThermo/psiThermo.C
+/*psiThermo/psiThermos.C*/
+
+$(workDir)/rhoThermo/rhoThermo.C
+/*rhoThermo/rhoThermos.C*/
+/*rhoThermo/liquidThermo.C*/
+
+$(workDir)/derivedFvPatchFields/fixedEnergy/fixedEnergyFvPatchScalarField.C
+$(workDir)/derivedFvPatchFields/gradientEnergy/gradientEnergyFvPatchScalarField.C
+$(workDir)/derivedFvPatchFields/mixedEnergy/mixedEnergyFvPatchScalarField.C
+
+$(workDir)/derivedFvPatchFields/energyJump/energyJump/energyJumpFvPatchScalarField.C
+$(workDir)/derivedFvPatchFields/energyJump/energyJumpAMI/energyJumpAMIFvPatchScalarField.C
+
+LIB = $(FOAM_USER_LIBBIN)/libdfFluidThermophysicalModels

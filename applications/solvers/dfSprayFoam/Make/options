@@ -1,0 +1,56 @@
+EXE_INC = -std=c++14 \
+    -I. \
+    -I$(FOAM_APP)/solvers/lagrangian/reactingParcelFoam \
+    -I$(FOAM_APP)/solvers/compressible/rhoPimpleFoam \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/sampling/lnInclude \
+    -I$(LIB_SRC)/TurbulenceModels/turbulenceModels/lnInclude \
+    -I$(LIB_SRC)/TurbulenceModels/compressible/lnInclude \
+    -I$(LIB_SRC)/regionModels/regionModel/lnInclude \
+    -I$(LIB_SRC)/regionModels/surfaceFilmModels/lnInclude \
+    -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/lagrangian/basic/lnInclude \
+    -I$(DF_SRC)/lagrangian/intermediate/lnInclude \
+    -I$(LIB_SRC)/lagrangian/intermediate/lnInclude \
+    -I$(DF_SRC)/lagrangian/spray/lnInclude \
+    -I$(LIB_SRC)/lagrangian/spray/lnInclude \
+    -I$(LIB_SRC)/lagrangian/distributionModels/lnInclude \
+    -I$(LIB_SRC)/transportModels/compressible/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(DF_SRC)/thermophysicalModels/thermophysicalProperties/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/thermophysicalProperties/lnInclude \
+    -I$(DF_SRC)/thermophysicalModels/SLGThermo/lnInclude \
+    -I$(DF_SRC)/CanteraMixture/lnInclude \
+    -I$(DF_SRC)/dfChemistryModel \
+    -I$(CANTERA_ROOT)/include \
+    -I$(TORCH_ROOT)/include \
+    -I$(TORCH_ROOT)/include/torch/csrc/api/include
+
+EXE_LIBS = \
+    -lturbulenceModels \
+    -llagrangian \
+    -lcompressibleTransportModels \
+    -lregionModels \
+    -ldfSurfaceFilmModels \
+    -lfiniteVolume \
+    -ldynamicFvMesh \
+    -ltopoChangerFvMesh \
+    -lmeshTools \
+    -lsampling \
+    -L$(FOAM_USER_LIBBIN) \
+    -ldfCompressibleTurbulenceModels \
+    -ldfFluidThermophysicalModels \
+    -ldfThermophysicalProperties \
+    -ldfSLGThermo \
+    -ldfLagrangianIntermediate \
+    -ldfLagrangianTurbulence \
+    -ldfLagrangianSpray \
+    -lCanteraMixture \
+    -ldfChemistryModel \
+    $(CANTERA_ROOT)/lib/libcantera.so \
+    $(TORCH_ROOT)/lib/libtorch.so \
+    $(TORCH_ROOT)/lib/libc10.so \
+    -rdynamic \
+    -lpthread

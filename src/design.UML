@@ -1,0 +1,244 @@
+@startuml
+
+IOdictionary <|-- basicThermo
+abstract class basicThermo{
+    __ Protected data __
+    #const word& phaseName_
+    #volScalarField& p_
+    #volScalarField T_
+    #volScalarField alpha_
+    #Switch dpdt_
+    __ Protected Member Functions __
+    #volScalarField& lookupOrConstruct(const fvMesh& mesh,const char* name) const
+    #wordList heBoundaryTypes()
+    #wordList heBoundaryBaseTypes()
+    __ Member functions __
+    +void correct() = 0
+    +Switch dpdt() const{return dpdt_}
+    __ Access to thermodynamic state variables __
+    +volScalarField& p() // [Pa]
+    +const volScalarField& p() const // [Pa]
+    +tmp<volScalarField> rho() const = 0 // [kg/m^3]
+    +tmp<scalarField> rho(patchi) const = 0 // [kg/m^3]
+    +volScalarField& he() = 0 // [J/kg]
+    +const volScalarField& he() const = 0 // [J/kg]
+    +tmp<volScalarField> he(p,T) const = 0 // [J/kg]
+    +tmp<scalarField> he(p,T,const labelList& cells) const = 0 // [J/kg]
+    +tmp<scalarField> he(p,T,patchi) const = 0 // [J/kg]
+    +tmp<volScalarField> hc() const = 0 // [J/kg]
+    +tmp<scalarField> THE(h,p,T0,const labelList& cells) const = 0
+    +tmp<scalarField> THE(h,p,T0,patchi) const = 0
+    __ Access to thermodynamic state variables __
+    +const volScalarField& T() const // [K]
+    +volScalarField& T() // [K]
+    +tmp<volScalarField> Cp() const = 0 // [J/kg/K]
+    +tmp<scalarField> Cp(p,T,patchi) const = 0 // [J/kg/K]
+    +tmp<volScalarField> Cv() const = 0 // [J/kg/K]
+    +tmp<scalarField> Cv(p,T,patchi) const = 0 // [J/kg/K]
+    +tmp<volScalarField> gamma() const = 0 // []
+    +tmp<scalarField> gamma(p,T,patchi) const = 0 // []
+    +tmp<volScalarField> Cpv() const = 0 // [J/kg/K]
+    +tmp<scalarField> Cpv(p,T,patchi) const = 0 // [J/kg/K]
+    +tmp<volScalarField> CpByCpv() const = 0 // []
+    +tmp<scalarField> CpByCpv(p,T,patchi) const = 0 // []
+    +tmp<volScalarField> W() const = 0 // [kg/kmol]
+    +tmp<scalarField> W(patchi) const = 0 // [kg/kmol]
+    __ Access to transport state variables __
+    +const volScalarField& alpha() const // [kg/m/s]
+    +const scalarField& alpha(patchi) const // [kg/m/s]
+    +tmp<volScalarField> kappa() const = 0 // [W/m/K]
+    +tmp<scalarField> kappa(patchi) const = 0 // [W/m/K]
+    +tmp<volScalarField> alphahe() const = 0 // [kg/m/s]
+    +tmp<scalarField> alphahe(const label patchi) const = 0 // [kg/m/s]
+    +tmp<volScalarField> kappaEff(const volScalarField&) const = 0 // [W/m/K]
+    +tmp<scalarField> kappaEff(alphat,patchi) const = 0 // [W/m/K]
+    +tmp<volScalarField> alphaEff(alphat) const = 0 // [kg/m/s]
+    +tmp<scalarField> alphaEff(alphat,patchi) const = 0 // [kg/m/s]
+}
+
+basicThermo <|-- fluidThermo
+compressibleTransportModel <|-- fluidThermo
+abstract class fluidThermo{
+    __ Member functions __
+    +void correctRho(const volScalarField& deltaRho) = 0
+    +const volScalarField& psi() const = 0 // [s^2/m^2]
+    +tmp<volScalarField> mu() const = 0 // [kg/m/s]
+    +tmp<scalarField> mu(patchi) const = 0 // [kg/m/s]
+    +tmp<volScalarField> nu() const // [m^2/s]
+    +tmp<scalarField> nu(patchi) const // [m^2/s]
+}
+
+fluidThermo <|-- psiThermo
+abstract psiThermo{
+    __ Protected data __
+    #volScalarField psi_
+    #volScalarField mu_
+    +virtual tmp<volScalarField> rho() const {return p_*psi_}
+    +virtual tmp<scalarField> rho(patchi) const
+    +virtual void correctRho(const volScalarField& deltaRho) {}
+    +virtual const volScalarField& psi() const
+    +virtual tmp<volScalarField> mu() const
+    +virtual tmp<scalarField> mu(patchi) const
+}
+
+
+CanteraMixture <|-- heThermo : MixtureType
+psiThermo <|-- heThermo : BasicThermo
+
+CanteraMixture *-- Cantera.Solution
+CanteraMixture *-- Cantera.ThermoPhase
+CanteraMixture *-- Cantera.Transport
+CanteraMixture *-- IOdictionary
+class CanteraMixture{
+    -IOdictionary CanteraTorchProperties_
+    -const word CanteraMechanismFile_
+    -std::shared_ptr<Cantera::Solution> CanteraSolution_
+    -std::shared_ptr<Cantera::ThermoPhase> CanteraGas_
+    -word transportModelName_
+    -std::shared_ptr<Cantera::Transport> CanteraTransport_
+    -hashedWordList species_
+    -PtrList<volScalarField> Y_
+    -const volScalarField& Tref_
+    -const volScalarField& pref_
+    -mutable scalarList yTemp_
+    +typedef CanteraMixture basicMixtureType
+    +typedef CanteraMixture thermoType
+    +static const bool incompressible = false
+    +static const bool isochoric = false
+    +CanteraMixture& cellMixture(celli)
+    +CanteraMixture& patchFaceMixture(patchi, facei)
+    +const scalar THE(scalar p, scalar T)
+    +const scalar psi(scalar p, scalar T)
+    +const scalar mu(scalar p, scalar T)
+    +const scalar alphah(scalar p, scalar T)
+    +const scalar HE(scalar p, scalar T)
+    +const scalar Hc(scalar p, scalar T)
+    +const scalar Cp(scalar p, scalar T)
+    +const scalar Cv(scalar p, scalar T)
+    +const scalar gamma(scalar p, scalar T)
+    +const scalar Cpv(scalar p, scalar T)
+    +const scalar CpByCpv(scalar p, scalar T)
+    +const scalar W() const
+    +static inline word heName() {return "ha"}
+    +PtrList<volScalarField>& Y()
+    +const PtrList<volScalarField>& Y() const
+    +volScalarField& Y(const label i)
+    +const volScalarField& Y(const label i) const
+    +volScalarField& Y(const word& specieName)
+    +const volScalarField& Y(const word& specieName) const
+    +const hashedWordList& species()
+    +scalar nSpecies()
+    +std::shared_ptr<Cantera::ThermoPhase> CanteraGas()
+    +std::shared_ptr<Cantera::Solution> CanteraSolution()
+    +std::shared_ptr<Cantera::Transport> CanteraTransport()
+    +const word& transportModelName()
+    -scalarList HaTemp_
+    -scalarList CpTemp_
+    -scalarList muTemp_
+    +void calcCp(const scalar T, const scalar p)
+    +void calcMu(const scalar T, const scalar p)
+    +void calcH(const scalar T, const scalar p)
+    +scalar Cp(label i, scalar p, scalar T) const
+    +scalar mu(label i, scalar p, scalar T) const
+    +scalar Ha(label i, scalar p, scalar T) const
+    +scalar Hc(label i) const
+    +scalar Hs(label i, scalar p, scalar T) const
+    +scalar kappa(label i, scalar p, scalar T) const
+    +scalar Wi(label i) const
+}
+
+
+abstract heThermo<BasicThermo, MixtureType>{
+    __ Protected data __
+    #volScalarField he_
+    __ Member functions __
+    +virtual typename MixtureType::basicMixtureType&composition(){return *this}
+    +virtual const typename MixtureType::basicMixtureType&composition() const{return *this}
+    +virtual word thermoName() const{return MixtureType::thermoType::typeName()}
+    +virtual volScalarField& he(){return he_} // [J/kg]
+    +virtual const volScalarField& he() const{return he_} // [J/kg]
+    +virtual tmp<volScalarField> he(p,T) const // [J/kg]
+    +virtual tmp<scalarField> he(p,T,const labelList& cells) const // [J/kg]
+    +virtual tmp<scalarField> he(p,T,patchi) const // [J/kg]
+    +virtual tmp<volScalarField> hc() const // [J/kg]
+    +virtual tmp<scalarField> THE(he, p, T0, const labelList& cells) const
+    +virtual tmp<scalarField> THE(he, p, T0, patchi) const
+    +virtual tmp<scalarField> Cp(p, T, patchi) const // [J/kg/K]
+    +virtual tmp<volScalarField> Cp() const // [J/kg/K]
+    +virtual tmp<scalarField> Cv(p, T, patchi) const // [J/kg/K]
+    +virtual tmp<volScalarField> Cv() const // [J/kg/K]
+    +virtual tmp<volScalarField> gamma() const // []
+    +virtual tmp<scalarField> gamma(p, T, patchi) const // [
+    +virtual tmp<scalarField> Cpv(p, T, patchi) const // [J/kg/K]
+    +virtual tmp<volScalarField> Cpv() const // [J/kg/K]
+    +virtual tmp<volScalarField> CpByCpv() const // []
+    +virtual tmp<scalarField> CpByCpv(p, T,patchi) const // []
+    +virtual tmp<volScalarField> W() const // [kg/kmol]
+    +virtual tmp<scalarField> W(const label patchi) const // [kg/kmol]
+    +virtual tmp<volScalarField> kappa() const // [W/m/K]
+    +virtual tmp<scalarField> kappa(patchi) const // [W/m/K]
+    +virtual tmp<volScalarField> alphahe() const // [kg/m/s]
+    +virtual tmp<scalarField> alphahe(patchi) const // [kg/m/s]
+    +virtual tmp<volScalarField> kappaEff(const volScalarField&) const // [W/m/K]
+    +virtual tmp<scalarField> kappaEff(alphat, patchi) const // [W/m/K]
+    +virtual tmp<volScalarField> alphaEff(alphat) const // [kg/m/s]
+    +virtual tmp<scalarField> alphaEff(alphat, patchi) const // [kg/m/s]
+}
+
+heThermo <|-- hePsiThermo
+class hePsiThermo<BasicPsiThermo, MixtureType>{
+    -calculate() : void
+    +correct() : void
+}
+
+IOdictionary <|-- dfChemistryModel
+basicThermo <.. dfChemistryModel :ThermoType
+dfChemistryModel o-- CanteraMixture
+class dfChemistryModel<ThermoType>{
+    -ThermoType& thermo_;
+    -CanteraMixture& mixture_
+    -std::shared_ptr<Cantera::ThermoPhase> CanteraGas_
+    -const fvMesh& mesh_
+    -Switch chemistry_
+    -scalar relTol_
+    -scalar absTol_
+    -PtrList<volScalarField>& Y_
+    -PtrList<volScalarField> rhoD_;
+    -PtrList<volScalarField> hai_;
+    -mutable scalarList yTemp_
+    -mutable scalarList dTemp_;
+    -mutable scalarList hrtTemp_;
+    -mutable scalarField cTemp_;
+    -PtrList<volScalarField::Internal> RR_
+    -hashedWordList species_
+    -volScalarField& alpha_
+    -volScalarField& T_
+    -const volScalarField& p_
+    -const volScalarField& rho_;
+    -volScalarField& mu_
+    -volScalarField& psi_
+    -volScalarField Qdot_;
+    -Switch torchSwitch_;
+    -word torchModelName_;
+    -scalarList Xmu_;
+    -scalarList Xstd_;
+    -scalarList Ymu_;
+    -scalarList Ystd_;
+    -scalar Tact_;
+    -scalar Qdotact_;
+
+    -void setNumerics(Cantera::ReactorNet &r)
+    -scalar canteraSolve(const DeltaTType& deltaT)
+    -scalar torchSolve(const DeltaTType& deltaT)
+    +virtual scalar solve(const scalar deltaT)
+    +virtual scalar solve(const scalarField& deltaT)
+    +virtual const volScalarField::Internal& RR(const label i) const
+    +virtual volScalarField::Internal& RR(const label i)
+    +virtual tmp<volScalarField> Qdot() const
+    +PtrList<volScalarField>& Y()
+    +const hashedWordList& species() const
+    +const volScalarField& rhoD(const label i) const
+    +volScalarField& hai(const label i)
+    +void correctThermo()
+}
+@enduml
