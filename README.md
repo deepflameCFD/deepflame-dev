@@ -1,5 +1,5 @@
-# DeepFlame v0.1.0
-DeepFlame is a computational fluid dynamics package for single or multiphase, laminar or turbulent, reacting flows in all speeds with machine learning capabilities.  
+# deepFlame v0.1.0
+deepFlame is a computational fluid dynamics package for single or multiphase, laminar or turbulent, reacting flows in all speeds with machine learning capabilities.  
 
 ## Dependencies
 OpenFOAM-7, Cantera C++ lib 2.6.0, Torch C++ lib 1.11.0
