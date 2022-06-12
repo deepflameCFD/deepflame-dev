@@ -21,7 +21,7 @@ conda install -c cantera libcantera-devel
 . install.sh
 ```
 
-some compiling issue may happens, try to consider compile your own Cantera and torch C++ libraries, instead of using conda installed Cantera C++ lib and the downloaded torch C++ lib.
+Some compiling issues may happen, try to consider compile your own Cantera and torch C++ libraries, instead of using conda installed Cantera C++ lib and the downloaded torch C++ lib.
 
 ## How to use
 
