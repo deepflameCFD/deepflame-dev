@@ -1,5 +1,5 @@
 # DeepFlame v0.1.0
-DeepFlame is a computational fluid dynamics suite for single or multiphase, laminar or turbulent, reacting flows in all speeds with machine learning capabilities. It aims to provide an open-source platform bringing together the individual strengths of OpenFOAM, Cantera and Torch libraries for machine learning assisted reacting flow simulations. It is also has the scope to incorporate next-generation heterogenous supercomputing and AI acceleration infrustructures such as GPU and FPGAs.  
+DeepFlame is a computational fluid dynamics suite for single or multiphase, laminar or turbulent reacting flows at all speeds with machine learning capabilities. It aims to provide an open-source platform bringing together the individual strengths of OpenFOAM, Cantera and Torch libraries for machine learning assisted reacting flow simulations. It is also has the scope to incorporate next-generation heterogenous supercomputing and AI acceleration infrustructures such as GPU and FPGAs.  
 
 ## Dependencies
 OpenFOAM-7, Cantera C++ lib 2.6.0, Torch C++ lib 1.11.0
