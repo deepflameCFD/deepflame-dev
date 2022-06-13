@@ -15,12 +15,18 @@ OpenFOAM-7, Cantera C++ lib 2.6.0, Torch C++ lib 1.11.0
 - Torch's tensor operation functionality for neutral network I/O and calculation
 - Interface for DNN model to obtain chemical reaction rates 
 - Multiple example and tutorial cases with `Allrun` and `Allclean` scripts
+  - 0D Perfectly Stirred Reactor
+  - 1D Freely Propagating Premixed Flame
+  - 2D Lifted Partially Premixed Triple Flame
+  - 3D Taylor-Green Vortex with Flame
+  - 1D Detotation Wave in Homogeneous Premixed Mixture
+  - 3D Aachen Bomb Spray Flame
 
 ## How to install
 ```shell
 # source your OpenFOAM
 
-# Note: libcantera does not yet support Arch system. You can set your libcantera path manually in deepflame/bashrc
+# Note: libcantera does not yet support Arch (i.e. Apple M1 Chip). You can set your libcantera path manually in deepflame/bashrc
 conda create -n libcantera
 conda activate libcantera
 conda install -c cantera libcantera-devel
