@@ -33,7 +33,7 @@ Refer to https://openfoam.org/version/7 for detailed installation instructions.
 ```
 source $HOME/OpenFOAM/OpenFOAM-7/etc/bashrc 
 ```
-3. Install precompiled libcantera via conda (Note: libcantera does not yet support Arch (i.e. Apple M1 Chip). You can set your libcantera path manually in deepflame-dev/bashrc)
+3. Install precompiled libcantera via conda (Note: libcantera does not yet support Arch (e.g. Apple M1 Chip). You can set your libcantera path manually in deepflame-dev/bashrc)
 ```
 conda create -n libcantera
 conda activate libcantera
