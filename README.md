@@ -73,4 +73,4 @@ Note: For the example cases with torchSover, an additional DNN model file in the
 ## Citing DeepFlame
 If you use DeepFlame for a publication, please use the citation: 
 
-DeepFlame: An computational fluid dynamics suite for multiphase turbulent reacting flows at all speeds with machine learning. URL:https://github.com/deepmodeling/deepflame-dev, 2022.
+DeepFlame: A computational fluid dynamics suite for multiphase turbulent reacting flows at all speeds with machine learning. URL:https://github.com/deepmodeling/deepflame-dev, 2022.
