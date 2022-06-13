@@ -33,20 +33,24 @@ source $HOME/OpenFOAM/OpenFOAM-7/etc/bashrc
 3. Install precompiled [LibCantera](https://anaconda.org/conda-forge/libcantera-devel) via conda
 ```
 conda create -n libcantera
+
 conda activate libcantera
+
 conda install -c conda-forge libcantera-devel
 ```
-4. Clone the [DeepFlame](https://github.com/deepmodeling/deepflame-dev) repository
+4. Clone the [DeepFlame repository](https://github.com/deepmodeling/deepflame-dev)
 ```
 git clone https://github.com/deepmodeling/deepflame-dev.git
+
 cd deepflame-dev
 ```
 5. Install precompiled [LibTorch](https://pytorch.org/) 
 ```
 wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.11.0%2Bcpu.zip
+
 unzip libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip -d thirdParty
 ```
-6. Install [DeepFlame](https://github.com/deepmodeling/deepflame-dev)
+6. Install DeepFlame
 ```
 . install.sh
 ```
@@ -64,6 +68,7 @@ source $HOME/deepflame-dev/bashrc
 3. Go to an example case directory, for example:
 ```
 cd $HOME/deepflame-dev/examples/zeroD_cubicReactor/H2/cvodeSolver
+
 ./Allrun
 ```
 
