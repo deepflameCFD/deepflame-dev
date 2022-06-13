@@ -53,18 +53,17 @@ unzip libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip -d thirdParty
 Some compiling issues may happen due to system compatability. Instead of using conda installed Cantera C++ lib and the downloaded Torch C++ lib, try to compile your own Cantera and Torch C++ libraries.
 
 ## Running DeepFlame examples
-1. Source your OpenFOAM, for example:
+1. Source your OpenFOAM, for example (depends on your OpenFOAM path):
 ```
 source $HOME/OpenFOAM/OpenFOAM-7/etc/bashrc 
 ```
-2. Source deepflame-dev/bashrc, for example:
+2. Source deepflame-dev/bashrc, for example (depends on your DeepFlame path):
 ```
 source $HOME/deepflame-dev/bashrc
 ```
 3. Go to an example case directory, for example:
 ```
-cd $HOME/deepflame-dev
-cd examples/zeroD_cubicReactor/H2/cvodeSolver/
+cd $HOME/deepflame-dev/examples/zeroD_cubicReactor/H2/cvodeSolver
 ./Allrun
 ```
 
