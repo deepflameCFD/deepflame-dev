@@ -1,8 +1,8 @@
 # DeepFlame v0.1.0
-DeepFlame is a computational fluid dynamics suite for single or multiphase, laminar or turbulent reacting flows at all speeds with machine learning capabilities. It aims to provide an open-source platform bringing together the individual strengths of OpenFOAM, Cantera and Torch libraries for machine learning assisted reacting flow simulations. It is also has the scope to incorporate next-generation heterogenous supercomputing and AI acceleration infrustructures such as GPU and FPGAs.  
+DeepFlame is a computational fluid dynamics suite for single or multiphase, laminar or turbulent reacting flows at all speeds with machine learning capabilities. It aims to provide an open-source platform bringing together the individual strengths of [OpenFOAM](https://openfoam.org), [Cantera](https://cantera.org) and [pyTorch](https://pytorch.org/) libraries for machine learning assisted reacting flow simulations. It is also has the scope to incorporate next-generation heterogenous supercomputing and AI acceleration infrustructures such as GPU and FPGAs.  
 
 ## Dependencies
-OpenFOAM-7, Cantera C++ lib 2.6.0, Torch C++ lib 1.11.0
+[OpenFOAM-7](https://openfoam.org/version/7), [Cantera C++ lib 2.6.0](https://anaconda.org/conda-forge/libcantera-devel), [Torch C++ lib 1.11.0](https://pytorch.org/)
 
 ## Features
 - Native Cantera reader for chemical mechanisms in `.cti`, `.xml` or `.ymal` formats
@@ -23,33 +23,30 @@ OpenFOAM-7, Cantera C++ lib 2.6.0, Torch C++ lib 1.11.0
   - 3D Aachen Bomb Spray Flame
 
 ## How to install
-The installation of DeepFlame is simple and requires OpenFOAM-7, libcantera and libtorch. 
+The installation of DeepFlame is simple and requires [OpenFOAM-7](https://openfoam.org/version/7), [LibCantera](https://anaconda.org/conda-forge/libcantera-devel) and [LibTorch](https://pytorch.org/) . 
 
-1. Install OpenFOAM-7 (if not already installed)
-```
-Refer to https://openfoam.org/version/7 for detailed installation instructions.
-```
+1. Install [OpenFOAM-7](https://openfoam.org/version/7) (if not already installed)
 2. Source your OpenFOAM at the default path below (or your own path for OpenFOAM bashrc)
 ```
 source $HOME/OpenFOAM/OpenFOAM-7/etc/bashrc 
 ```
-3. Install precompiled libcantera via conda
+3. Install precompiled [LibCantera](https://anaconda.org/conda-forge/libcantera-devel) via conda
 ```
 conda create -n libcantera
 conda activate libcantera
 conda install -c conda-forge libcantera-devel
 ```
-4. Clone the DeepFlame repository
+4. Clone the [DeepFlame](https://github.com/deepmodeling/deepflame-dev) repository
 ```
 git clone https://github.com/deepmodeling/deepflame-dev.git
 cd deepflame-dev
 ```
-5. Install precompiled libtorch 
+5. Install precompiled [LibTorch](https://pytorch.org/) 
 ```
 wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.11.0%2Bcpu.zip
 unzip libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip -d thirdParty
 ```
-6. Install DeepFlame
+6. Install [DeepFlame](https://github.com/deepmodeling/deepflame-dev)
 ```
 . install.sh
 ```
