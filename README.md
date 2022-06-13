@@ -23,28 +23,56 @@ OpenFOAM-7, Cantera C++ lib 2.6.0, Torch C++ lib 1.11.0
   - 3D Aachen Bomb Spray Flame
 
 ## How to install
-```shell
-# source your OpenFOAM
+The installation of DeepFlame is simple and requires OpenFOAM-7, libcantera and libtorch. 
 
-# Note: libcantera does not yet support Arch (i.e. Apple M1 Chip). You can set your libcantera path manually in deepflame/bashrc
+1. Install OpenFOAM-7 (if not already installed)
+```
+Refer to https://openfoam.org/version/7 for detailed installation instructions.
+```
+2. Source your OpenFOAM at the default path below (or your own path for OpenFOAM bashrc)
+```
+source $HOME/OpenFOAM/OpenFOAM-7/etc/bashrc 
+```
+3. Install precompiled libcantera via conda (Note: libcantera does not yet support Arch (i.e. Apple M1 Chip). You can set your libcantera path manually in deepflame-dev/bashrc)
+```
 conda create -n libcantera
 conda activate libcantera
 conda install -c cantera libcantera-devel
-
+```
+4. Clone the DeepFlame repository
+```
+git clone https://github.com/deepmodeling/deepflame-dev.git
+cd deepflame-dev
+```
+5. Install precompiled libtorch 
+```
+wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.11.0%2Bcpu.zip
+unzip libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip -d thirdParty
+```
+6. Install DeepFlame
+```
 . install.sh
 ```
+Some compiling issues may happen due to system compatability. Instead of using conda installed Cantera C++ lib and the downloaded Torch C++ lib, try to compile your own Cantera and Torch C++ libraries.
 
-Some compiling issues may happen, try to consider compile your own Cantera and torch C++ libraries, instead of using conda installed Cantera C++ lib and the downloaded torch C++ lib.
-
-## How to use
-
-```shell
-# source your OpenFOAM
-source deepflame/bashrc
+## Running DeepFlame examples
+1. Source your OpenFOAM, for example:
 ```
-cd to examples, execute Allrun
+source $HOME/OpenFOAM/OpenFOAM-7/etc/bashrc 
+```
+2. Source deepflame-dev/bashrc, for example:
+```
+source $HOME/deepflame-dev/bashrc
+```
+3. Go to an example case directory, for example:
+```
+cd $HOME/deepflame-dev
+cd examples/zeroD_cubicReactor/H2/cvodeSolver/
+./Allrun
+```
 
-for torch model, please contact ? or read this paper ?
+Note: For the example cases with torchSover, an additional DNN model file in the `.pt` format is required. Please contact the developers if you would like a test run. 
+
 
 ## Citing DeepFlame
 If you use DeepFlame for a publication, please use the citation: 
