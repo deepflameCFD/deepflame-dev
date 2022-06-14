@@ -30,7 +30,7 @@ The installation of DeepFlame is simple and requires [OpenFOAM-7](https://openfo
 ```
 source $HOME/OpenFOAM/OpenFOAM-7/etc/bashrc 
 ```
-3. Install precompiled [LibCantera](https://anaconda.org/conda-forge/libcantera-devel) via conda
+3. Install precompiled [LibCantera](https://anaconda.org/conda-forge/libcantera-devel) via [conda](https://docs.conda.io/en/latest/miniconda.html#linux-installers)
 ```
 conda create -n libcantera
 
