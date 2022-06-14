@@ -26,7 +26,7 @@ DeepFlame is a computational fluid dynamics suite for single or multiphase, lami
 The installation of DeepFlame is simple and requires [OpenFOAM-7](https://openfoam.org/version/7), [LibCantera](https://anaconda.org/conda-forge/libcantera-devel) and [LibTorch](https://pytorch.org/) . 
 
 1. Install [OpenFOAM-7](https://openfoam.org/version/7) (if not already installed)
-2. Source your OpenFOAM at the default path below (or your own path for OpenFOAM bashrc)
+2. Source your OpenFOAM via the default path below (or your own path for OpenFOAM bashrc)
 ```
 source $HOME/OpenFOAM/OpenFOAM-7/etc/bashrc 
 ```
@@ -72,7 +72,7 @@ cd $HOME/deepflame-dev/examples/zeroD_cubicReactor/H2/cvodeSolver
 ./Allrun
 ```
 
-Note: For the example cases with torchSover, an additional DNN model file in the `.pt` format is required. Please contact the developers if you would like a test run. 
+Note: For the example cases with torchSolver, an additional DNN model file in the `.pt` format is required. Please contact the developers if you would like a test run. 
 
 
 ## Citing DeepFlame
