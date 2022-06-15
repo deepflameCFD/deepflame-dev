@@ -38,6 +38,8 @@ conda activate libcantera
 
 conda install -c conda-forge libcantera-devel
 ```
+Note: Check your Miniconda3/envs/libcantera directory and make sure the install was successful (lib/ include/ etc. exist).
+
 4. Clone the [DeepFlame repository](https://github.com/deepmodeling/deepflame-dev)
 ```
 git clone https://github.com/deepmodeling/deepflame-dev.git
@@ -54,7 +56,7 @@ unzip libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip -d thirdParty
 ```
 . install.sh
 ```
-Some compiling issues may happen due to system compatability. Instead of using conda installed Cantera C++ lib and the downloaded Torch C++ lib, try to compile your own Cantera and Torch C++ libraries.
+Note: Some compiling issues may happen due to system compatability. Instead of using conda installed Cantera C++ lib and the downloaded Torch C++ lib, try to compile your own Cantera and Torch C++ libraries.
 
 ## Running DeepFlame examples
 1. Source your OpenFOAM, for example (depends on your OpenFOAM path):
