@@ -25,6 +25,8 @@ License
 
 #include "dfChemistryModel.H"
 #include "UniformField.H"
+#include "clockTime.H"
+#include "loadBalancing/runtime_assert.H"
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -80,7 +82,20 @@ Foam::dfChemistryModel<ThermoType>::dfChemistryModel
         mesh_,
         dimensionedScalar(dimEnergy/dimVolume/dimTime, 0)
     ),
-    torchSwitch_(lookupOrDefault("torch", false))
+    torchSwitch_(lookupOrDefault("torch", false)),
+    cpuTimes_
+    (
+        IOobject
+        (
+            "cellCpuTimes",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh_,
+        scalar(0.0)
+    )
 {
     if(torchSwitch_)
     {
@@ -191,7 +206,8 @@ Foam::scalar Foam::dfChemistryModel<ThermoType>::solve
     }
     else
     {
-        result = canteraSolve(deltaT);
+        //result = canteraSolve(deltaT);
+        result = solve_loadBalance(deltaT);
     }
     return result;
 }
@@ -608,6 +624,297 @@ void Foam::dfChemistryModel<ThermoType>::correctThermo()
             }
         }
     }
+}
+
+template<class ThermoType>
+void Foam::dfChemistryModel<ThermoType>::solveSingle
+(
+    ChemistryProblem& problem, ChemistrySolution& solution
+)
+{
+    scalar timeLeft = problem.deltaT;
+    scalarList c0 = problem.c;
+
+    // Timer begins
+    clockTime time;
+    time.timeIncrement();
+
+    Cantera::Reactor react;
+    const scalar Ti = problem.Ti;
+    const scalar pi = problem.pi;
+    const scalarList Y = problem.Y;
+
+
+    CanteraGas_->setState_TPY(Ti, pi, Y.begin());
+    CanteraGas_->getConcentrations(c0.begin()); // value --> c0
+
+    react.insert(mixture_.CanteraSolution());
+    react.setEnergy(0); // keep T const before and after sim.advance. this will give you a little improvement
+    Cantera::ReactorNet sim;
+    sim.addReactor(react);
+    setNumerics(sim);
+
+    sim.advance(problem.deltaT);
+
+    // get new concentrations
+    CanteraGas_->getConcentrations(cTemp_.begin()); // value --> cTemp_
+    problem.c = cTemp_;
+
+
+    solution.c_increment = (problem.c - c0) / problem.deltaT;
+    //solution.deltaTChem = min(problem.deltaTChem, this->deltaTChemMax_);
+
+    // Timer ends
+    solution.cpuTime = time.timeIncrement();
+
+    solution.cellid = problem.cellid;
+    solution.rhoi = problem.rhoi;
+}
+
+
+
+template <class ThermoType>
+template<class DeltaTType>
+Foam::DynamicList<Foam::ChemistryProblem>
+Foam::dfChemistryModel<ThermoType>::getProblems
+(
+    const DeltaTType& deltaT
+)
+{
+    const scalarField& T = T_;
+    const scalarField& p = p_;
+    const scalarField& rho = rho_;
+
+
+    DynamicList<ChemistryProblem> solved_problems;
+
+    //solved_problems.resize(p.size(), ChemistryProblem(mixture_.nSpecies()));
+
+    scalarField massFraction(mixture_.nSpecies());
+    //scalarField concentration(mixture_.nSpecies());
+
+    label counter = 0;
+    forAll(T, celli)
+    {
+
+        //if(T[celli] > this->Treact())
+        {
+            //for(label i = 0; i < mixture_.nSpecies(); i++)
+            //{
+                //concentration[i] = rho[celli] * this->Y_[i][celli] / this->specieThermo_[i].W();
+            //    massFraction[i] = this->Y_[i][celli];
+            //}
+
+            ChemistryProblem problem;
+            //problem.c = concentration;
+            problem.Y = massFraction;
+            problem.Ti = T[celli];
+            problem.pi = p[celli];
+            problem.rhoi = rho[celli];
+            //problem.deltaTChem = this->deltaTChem_[celli];
+            problem.deltaT = deltaT[celli];
+            //problem.cpuTime = cpuTimes_[celli];
+            problem.cellid = celli;
+
+
+
+            solved_problems[counter] = problem;
+            counter++;
+
+
+        }
+        //else
+        //{
+            // for(label i = 0; i < this->nSpecie(); i++)
+            // {
+            //     this->RR_[i][celli] = 0;
+            // }
+        //}
+
+    }
+
+    //the real size is set here
+    solved_problems.setSize(counter);
+
+    return solved_problems;
+}
+
+
+template <class ThermoType>
+Foam::DynamicList<Foam::ChemistrySolution>
+Foam::dfChemistryModel<ThermoType>::solveList
+(
+    UList<ChemistryProblem>& problems
+)
+{
+    DynamicList<ChemistrySolution> solutions(
+        problems.size(), ChemistrySolution(mixture_.nSpecies()));
+
+    for(label i = 0; i < problems.size(); ++i)
+    {
+        solveSingle(problems[i], solutions[i]);
+    }
+    return solutions;
+}
+
+
+template <class ThermoType>
+Foam::RecvBuffer<Foam::ChemistrySolution>
+Foam::dfChemistryModel<ThermoType>::solveBuffer
+(
+    RecvBuffer<ChemistryProblem>& problems
+)
+{
+    // allocate the solutions buffer
+    RecvBuffer<ChemistrySolution> solutions;
+
+    for(auto& p : problems)
+    {
+        solutions.append(solveList(p));
+    }
+    return solutions;
+}
+
+
+
+template <class ThermoType>
+Foam::scalar
+Foam::dfChemistryModel<ThermoType>::updateReactionRates
+(
+    const RecvBuffer<ChemistrySolution>& solutions
+)
+{
+    scalar deltaTMin = great;
+
+    for(const auto& array : solutions)
+    {
+        for(const auto& solution : array)
+        {
+
+            // for(label j = 0; j < mixture_.nSpecies(); j++)
+            // {
+            //     this->RR_[j][solution.cellid] =
+            //         solution.c_increment[j] * this->specieThermo_[j].W();
+            // }
+
+            // deltaTMin = min(solution.deltaTChem, deltaTMin);
+
+            // this->deltaTChem_[solution.cellid] =
+            //     min(solution.deltaTChem, this->deltaTChemMax_);
+
+            cpuTimes_[solution.cellid] = solution.cpuTime;
+        }
+    }
+
+    return deltaTMin;
+}
+
+
+template <class ThermoType>
+void Foam::dfChemistryModel<ThermoType>::updateReactionRate
+(
+    const ChemistrySolution& solution, const label& i
+)
+{
+    //for(label j = 0; j < mixture_.nSpecies(); j++)
+    {
+        //this->RR_[j][i] = solution.c_increment[j] * this->specieThermo_[j].W();
+    }
+    //this->deltaTChem_[i] = min(solution.deltaTChem, this->deltaTChemMax_);
+}
+
+
+template <class ThermoType>
+Foam::LoadBalancer
+Foam::dfChemistryModel<ThermoType>::createBalancer()
+{
+    const IOdictionary chemistryDict_tmp
+        (
+            IOobject
+            (
+                "CanteraTorchProperties",
+                thermo_.db().time().constant(),
+                thermo_.db(),
+                IOobject::MUST_READ,
+                IOobject::NO_WRITE,
+                false
+            )
+        );
+
+    return LoadBalancer(chemistryDict_tmp);
+}
+
+
+
+template <class ThermoType>
+template <class DeltaTType>
+Foam::scalar Foam::dfChemistryModel<ThermoType>::solve_loadBalance
+(
+    const DeltaTType& deltaT
+)
+{
+    // CPU time analysis
+    clockTime timer;
+    scalar t_getProblems(0);
+    scalar t_updateState(0);
+    scalar t_balance(0);
+    scalar t_solveBuffer(0);
+    scalar t_unbalance(0);
+
+    if(!this->chemistry_)
+    {
+        return great;
+    }
+
+    timer.timeIncrement();
+    DynamicList<ChemistryProblem> allProblems = getProblems(deltaT);
+    t_getProblems = timer.timeIncrement();
+
+    RecvBuffer<ChemistrySolution> incomingSolutions;
+
+    if(balancer_.active())
+    {
+        timer.timeIncrement();
+        balancer_.updateState(allProblems);
+        t_updateState = timer.timeIncrement();
+
+        timer.timeIncrement();
+        auto guestProblems = balancer_.balance(allProblems);
+        auto ownProblems = balancer_.getRemaining(allProblems);
+        t_balance = timer.timeIncrement();
+
+        timer.timeIncrement();
+        auto ownSolutions = solveList(ownProblems);
+        auto guestSolutions = solveBuffer(guestProblems);
+        t_solveBuffer = timer.timeIncrement();
+
+        timer.timeIncrement();
+        incomingSolutions = balancer_.unbalance(guestSolutions);
+        incomingSolutions.append(ownSolutions);
+        t_unbalance = timer.timeIncrement();
+    }
+    else
+    {
+        timer.timeIncrement();
+        incomingSolutions.append(solveList(allProblems));
+        t_solveBuffer = timer.timeIncrement();
+    }
+
+    if(balancer_.log())
+    {
+        balancer_.printState();
+        cpuSolveFile_() << setw(22)
+                        << this->time().timeOutputValue()<<tab
+                        << setw(22) << t_getProblems<<tab
+                        << setw(22) << t_updateState<<tab
+                        << setw(22) << t_balance<<tab
+                        << setw(22) << t_solveBuffer<<tab
+                        << setw(22) << t_unbalance<<tab
+                        << setw(22) << Pstream::myProcNo()
+                        << endl;
+    }
+
+    return updateReactionRates(incomingSolutions);
 }
 
 // ************************************************************************* //
