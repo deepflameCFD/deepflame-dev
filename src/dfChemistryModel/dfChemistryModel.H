@@ -47,7 +47,13 @@ SourceFiles
 #include "hashedWordList.H"
 #include "psiThermo.H"
 #include "physicoChemicalConstants.H" // for R
-
+#include "loadBalancing/ChemistryProblem.H"
+#include "loadBalancing/ChemistrySolution.H"
+#include "loadBalancing/RecvBuffer.H"
+#include "loadBalancing/SendBuffer.H"
+#include "loadBalancing/LoadBalancer.H"
+#include "OFstream.H"
+#include "IOmanip.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -88,7 +94,7 @@ public IOdictionary
     // temp H/RT
     mutable scalarList hrtTemp_; // absolute_enthalpy/RT
     // temp molar concentration
-    mutable scalarField cTemp_;
+    mutable scalarList cTemp_;
     // mass change rate, [kg/m^3/s]
     PtrList<volScalarField::Internal> RR_;
     hashedWordList species_;
@@ -110,6 +116,12 @@ public IOdictionary
     scalar Tact_;
     scalar Qdotact_;
 
+    // Load balancing object
+    LoadBalancer balancer_;
+    // Field containing chemistry CPU time information
+    volScalarField cpuTimes_;
+    // A file to output the balancing stats
+    autoPtr<OFstream>        cpuSolveFile_;
 
     // Private Member Functions
 
@@ -178,6 +190,35 @@ public:
 
         // update T, psi, mu, alpha, rhoD, hai (if needed)
         void correctThermo();
+
+        void solveSingle(ChemistryProblem& problem, ChemistrySolution& solution);
+
+        template<class DeltaTType>
+        DynamicList<ChemistryProblem> getProblems(const DeltaTType& deltaT);
+
+        //- Solve a list of chemistry problems and return a list of solutions
+        DynamicList<ChemistrySolution>
+        solveList(UList<ChemistryProblem>& problems);
+
+        //- Solve the problem buffer coming from the balancer
+        RecvBuffer<ChemistrySolution>
+        solveBuffer(RecvBuffer<ChemistryProblem>& problems);
+
+        //- Update the reaction rates from a list of solutions
+        scalar updateReactionRates(const RecvBuffer<ChemistrySolution>& solutions);
+
+        //- Create a load balancer object
+        LoadBalancer createBalancer();
+
+        template<class DeltaTType>
+        scalar solve_loadBalance(const DeltaTType& deltaT);
+
+        Foam::autoPtr<Foam::OFstream> logFile(const word& name) const
+        {
+            mkDir(mesh_.time().path() / "loadBal" / this->group());
+            return autoPtr<OFstream>(new OFstream(
+                mesh_.time().path() / "loadBal" / this->group() / name));
+        }
 };
 
 

@@ -64,3 +64,4 @@ libtorch/
 polyMesh/
 thirdParty
 libtorch*.zip*
+.DS_Store

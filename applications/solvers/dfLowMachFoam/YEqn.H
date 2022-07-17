@@ -1,6 +1,6 @@
-vk = Zero;
-diffsh = Zero;
-Derror = Zero;
+hDiffCorrFlux = Zero;
+diffAlphaD = Zero;
+sumYDiffError = Zero;
 
 tmp<fv::convectionScheme<scalar>> mvConvection
 (
@@ -15,9 +15,9 @@ tmp<fv::convectionScheme<scalar>> mvConvection
 
 forAll(Y, i)
 {
-    Derror += chemistry.rhoD(i)*fvc::grad(Y[i]);
+    sumYDiffError += chemistry.rhoD(i)*fvc::grad(Y[i]);
 }
-const surfaceScalarField phiUc = linearInterpolate(Derror) & mesh.Sf();
+const surfaceScalarField phiUc = linearInterpolate(sumYDiffError) & mesh.Sf();
 
 {
     start = std::clock();
@@ -34,8 +34,8 @@ const surfaceScalarField phiUc = linearInterpolate(Derror) & mesh.Sf();
     forAll(Y, i)
     {
         volScalarField& Yi = Y[i];
-        vk += chemistry.hai(i)*(chemistry.rhoD(i)*fvc::grad(Yi) - Yi*Derror);
-        diffsh += fvc::laplacian(thermo.alpha()*chemistry.hai(i), Yi);
+        hDiffCorrFlux += chemistry.hai(i)*(chemistry.rhoD(i)*fvc::grad(Yi) - Yi*sumYDiffError);
+        diffAlphaD += fvc::laplacian(thermo.alpha()*chemistry.hai(i), Yi);
 
         if (i != inertIndex)
         {

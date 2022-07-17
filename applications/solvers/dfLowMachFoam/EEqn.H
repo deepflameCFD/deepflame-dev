@@ -7,9 +7,9 @@
       + fvc::ddt(rho, K) + fvc::div(phi, K)
       - dpdt
       - fvm::laplacian(turbulence->alphaEff(), he)
-      + diffsh
+      + diffAlphaD
      ==
-        fvc::div(vk)
+        fvc::div(hDiffCorrFlux)
     );
 
     EEqn.relax();
