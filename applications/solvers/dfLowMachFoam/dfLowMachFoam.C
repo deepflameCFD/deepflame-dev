@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
             end = std::clock();
             time_monitor_flow += double(end - start) / double(CLOCKS_PER_SEC);
 
-            #include "YEqn.H"
+            #include "YEqn.H"//added by zhangyan 20220226
             #include "EEqn.H"
             chemistry.correctThermo();
             Info<< "min/max(T) = " << min(T).value() << ", " << max(T).value() << endl;

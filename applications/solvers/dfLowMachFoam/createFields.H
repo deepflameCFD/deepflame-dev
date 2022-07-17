@@ -86,11 +86,11 @@ forAll(Y, i)
 fields.add(thermo.he());
 
 const scalar Sct = chemistry.lookupOrDefault("Sct", 1.);
-volScalarField diffAlphaD
+volScalarField diffsh
 (
     IOobject
     (
-        "diffAlphaD",
+        "diffsh",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
@@ -99,11 +99,11 @@ volScalarField diffAlphaD
     mesh,
     dimensionedScalar(dimEnergy/dimTime/dimVolume, 0)
 );
-volVectorField hDiffCorrFlux
+volVectorField vk
 (
     IOobject
     (
-        "hDiffCorrFlux",
+        "vk",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
@@ -112,16 +112,16 @@ volVectorField hDiffCorrFlux
     mesh,
     dimensionedVector(dimensionSet(1,0,-3,0,0,0,0), Zero)
 );
-volVectorField sumYDiffError
+volVectorField Derror
 (
     IOobject
     (
-        "sumYDiffError",
+        "Derror",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
         IOobject::NO_WRITE
     ),
     mesh,
-    dimensionedVector("sumYDiffError", dimDynamicViscosity/dimLength, Zero)
+    dimensionedVector("Derror", dimDynamicViscosity/dimLength, Zero)
 );
